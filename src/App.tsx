@@ -8,10 +8,11 @@ import { Selector } from "./components/Selector";
 import { categories } from "./utils/categories";
 import { countries } from "./utils/countries";
 import debounce from "lodash.debounce";
+import { ClearButton } from "./components/ClearButton";
 
 export function App() {
-  const [category, setCategory] = useState<string | null>(null);
-  const [country, setCountry] = useState<string | null>(null);
+  const [category, setCategory] = useState<string | null>('');
+  const [country, setCountry] = useState<string | null>('');
   const [query, setQuery] = useState<string>("");
   const [appliedFilterQuery, setAppliedFilterQuery] = useState<string>("");
 
@@ -32,27 +33,43 @@ export function App() {
     applyQuery(q);
   };
 
+  const handleClearFilters = () => {
+    setCategory('');
+    setCountry('');
+  }
+
+  const handleQueryClear = () => {
+    setQuery('');
+    setAppliedFilterQuery('');
+  }
+
   return (
-    <div className="max-w-[1200px] mx-auto mt-15">
+    <div className="max-w-[1200px] mx-auto my-15">
       <h1 className="text-center font-bold text-5xl">World news</h1>
 
-      <div className="flex flex-col justify-center mt-10 gap-10">
-        <Search placeholder={"Search news..."} query={query} setQuery={handleQueryChange} />
+      <div className="flex flex-col justify-center my-10 gap-10">
+        <Search placeholder={"Search news..."} query={query} setQuery={handleQueryChange} handleClear={handleQueryClear} />
 
-        <div className="flex justify-center gap-5 flex-wrap">
-          <Selector
-            label="Categories"
-            placeholder="Select a category"
-            arrayOfValues={categories}
-            setValue={setCategory}
-          />
+        <div className="flex flex-col gap-5 justify-center items-center">
+          <div className="flex justify-center gap-5 flex-wrap">
+            <Selector
+              label="Categories"
+              placeholder="Select a category"
+              value={category}
+              arrayOfValues={categories}
+              setValue={setCategory}
+            />
 
-          <Selector
-            label="Countries"
-            placeholder="Select a country"
-            arrayOfValues={countries}
-            setValue={setCountry}
-          />
+            <Selector
+              label="Countries"
+              placeholder="Select a country"
+              value={country}
+              arrayOfValues={countries}
+              setValue={setCountry}
+            />
+          </div>
+
+          <ClearButton buttonLabel="Clear filters" variant="destructive" onClick={handleClearFilters} />
         </div>
       </div>
 
