@@ -9,12 +9,17 @@ import { categories } from "./utils/categories";
 import { countries } from "./utils/countries";
 import debounce from "lodash.debounce";
 import { ClearButton } from "./components/ClearButton";
+import { NewsDetailsModal } from "./components/NewsDetailsModal";
+import { Button } from "./components/ui/button";
+import { Eye } from "lucide-react";
 
 export function App() {
   const [category, setCategory] = useState<string | null>('');
   const [country, setCountry] = useState<string | null>('');
   const [query, setQuery] = useState<string>("");
   const [appliedFilterQuery, setAppliedFilterQuery] = useState<string>("");
+  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const { isPending, error, data } = useQuery({
     queryKey: ["news", { category, country, q: appliedFilterQuery || null }],
@@ -41,6 +46,16 @@ export function App() {
   const handleQueryClear = () => {
     setQuery('');
     setAppliedFilterQuery('');
+  }
+
+  const handleViewDetails = (news: NewsItem) => {
+    setSelectedNews(news);
+    setIsModalOpen(true);
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedNews(null);
   }
 
   return (
@@ -104,18 +119,35 @@ export function App() {
             <div className="p-4">
               <h2 className="font-bold text-xl mb-2 line-clamp-3">{news.title}</h2>
               <p className="text-gray-700 text-base line-clamp-4">{news.description}</p>
-              <a
-                href={news.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:underline mt-2 block"
-              >
-                Read more
-              </a>
+              <div className="flex justify-between items-center mt-4">
+                <a
+                  href={news.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  Read more
+                </a>
+                <Button
+                  onClick={() => handleViewDetails(news)}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Eye className="h-4 w-4" />
+                  View Details
+                </Button>
+              </div>
             </div>
           </div>
         ))}
       </div>
+
+      <NewsDetailsModal
+        news={selectedNews}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }
